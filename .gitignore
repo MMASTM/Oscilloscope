@@ -18,3 +18,6 @@
 /Project/Oscilloscope/Firmware/MDK-ARM/Firmware 
 /Project/Oscilloscope/Graphic/build 
 
+.vscode/iar-vsc.json
+touchgfx/framework/source/platform/hal/nxp/lpcspifilib/proj/lib_lpcspifi_M0/BrowseInfo/.ninja_deps
+/touchgfx/framework/source/platform/hal/nxp/lpcspifilib/proj

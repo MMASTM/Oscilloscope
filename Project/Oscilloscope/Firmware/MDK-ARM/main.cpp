@@ -174,7 +174,7 @@ int main(void)
 	hw_init();
 	touchgfx_init();
 
-  qsettings_init();
+    qsettings_init();
 
 	MX_GPIO_Init();
 	MX_DMA_Init();
