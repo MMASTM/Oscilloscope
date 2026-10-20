@@ -33,9 +33,9 @@
  *
  *****************************************************************************/
 
- /*
-  * Include Section
-  */
+/*
+ * Include Section
+ */
 #include <touchgfx/hal/HAL.hpp>
 #include <touchgfx/hal/BoardConfiguration.hpp>
 
@@ -65,28 +65,27 @@ using namespace touchgfx;
 /*
  * Define const/macros
  */
-#define ULONG_MAX 0xFFFFFFFFUL 
-#define  ADC_BUFF_SIZ   2000
-#define configGUI_TASK_PRIORITY                 ( tskIDLE_PRIORITY + 3 )
-#define configGUI_TASK_STK_SIZE                 ( 4096 )
+#define ULONG_MAX 0xFFFFFFFFUL
+#define ADC_BUFF_SIZ 2000
+#define configGUI_TASK_PRIORITY (tskIDLE_PRIORITY + 3)
+#define configGUI_TASK_STK_SIZE (4096)
 #define CANVAS_BUFFER_SIZE (4000)
-#define RX_BUFF_SIZE   128
+#define RX_BUFF_SIZE 128
 #ifdef __GNUC__
- /* With GCC/RAISONANCE, small printf (option LD Linker->Libraries->Small printf
-	set to 'Yes') calls __io_putchar() */
+/* With GCC/RAISONANCE, small printf (option LD Linker->Libraries->Small printf
+   set to 'Yes') calls __io_putchar() */
 #define PUTCHAR_PROTOTYPE int __io_putchar(int ch)
 #else
 #define PUTCHAR_PROTOTYPE int fputc(int ch, FILE *f)
 #endif /* __GNUC__ */
 
-
 /*
  * Define variables
  */
-TimerHandle_t  htimer;
+TimerHandle_t htimer;
 uint8_t canvasBuffer[CANVAS_BUFFER_SIZE];
 uint16_t adc_chn1_buffer[ADC_BUFF_SIZ];
-uint16_t adc_chn2_buffer[ADC_BUFF_SIZ]; 
+uint16_t adc_chn2_buffer[ADC_BUFF_SIZ];
 
 uint16_t adc_chn1_readptr = 0;
 uint16_t adc_chn2_readptr = 0;
@@ -114,37 +113,217 @@ struct UART2_Rx
 };
 
 UART2_Rx tempBuff;
-uint8_t* ptrTempBuff = &tempBuff.buff[0];
-const uint16_t sine_wave[100] = 
-{
-    2048, 2177, 2305, 2432, 2557, 2681, 2802, 2920, 3035, 3145,
-		3252, 3353, 3450, 3541, 3626, 3705, 3777, 3843, 3901, 3952,
-		3996, 4032, 4060, 4080, 4091, 4095, 4091, 4080, 4060, 4032,
-		3996, 3952, 3901, 3843, 3777, 3705, 3626, 3541, 3450, 3353,
-		3252, 3145, 3035, 2920, 2802, 2681, 2557, 2432, 2305, 2177,
-		2048, 1919, 1791, 1664, 1539, 1415, 1294, 1176, 1061, 951,
-		844, 743, 646, 555, 470, 391, 319, 253, 195, 144,
-		100, 64, 36, 16, 4, 0, 4, 16, 36, 64,
-		100, 144, 195, 253, 319, 391, 470, 555, 646, 743,
-		844, 951, 1061, 1176, 1294, 1415, 1539, 1664, 1791, 1919,
+uint8_t *ptrTempBuff = &tempBuff.buff[0];
+const uint16_t sine_wave[100] =
+	{
+		2048,
+		2177,
+		2305,
+		2432,
+		2557,
+		2681,
+		2802,
+		2920,
+		3035,
+		3145,
+		3252,
+		3353,
+		3450,
+		3541,
+		3626,
+		3705,
+		3777,
+		3843,
+		3901,
+		3952,
+		3996,
+		4032,
+		4060,
+		4080,
+		4091,
+		4095,
+		4091,
+		4080,
+		4060,
+		4032,
+		3996,
+		3952,
+		3901,
+		3843,
+		3777,
+		3705,
+		3626,
+		3541,
+		3450,
+		3353,
+		3252,
+		3145,
+		3035,
+		2920,
+		2802,
+		2681,
+		2557,
+		2432,
+		2305,
+		2177,
+		2048,
+		1919,
+		1791,
+		1664,
+		1539,
+		1415,
+		1294,
+		1176,
+		1061,
+		951,
+		844,
+		743,
+		646,
+		555,
+		470,
+		391,
+		319,
+		253,
+		195,
+		144,
+		100,
+		64,
+		36,
+		16,
+		4,
+		0,
+		4,
+		16,
+		36,
+		64,
+		100,
+		144,
+		195,
+		253,
+		319,
+		391,
+		470,
+		555,
+		646,
+		743,
+		844,
+		951,
+		1061,
+		1176,
+		1294,
+		1415,
+		1539,
+		1664,
+		1791,
+		1919,
 };
 
-const uint16_t square_wave[100] = 
-{
-    4095,4095,4095,4095,4095,4095,4095,4095,4095,4095,
-		4095,4095,4095,4095,4095,4095,4095,4095,4095,4095,
-		4095,4095,4095,4095,4095,4095,4095,4095,4095,4095,
-		4095,4095,4095,4095,4095,4095,4095,4095,4095,4095,
-		4095,4095,4095,4095,4095,4095,4095,4095,4095,4095,	
-	  0,0,0,0,0,0,0,0,0,0,
-	  0,0,0,0,0,0,0,0,0,0,		
-	  0,0,0,0,0,0,0,0,0,0,
-	  0,0,0,0,0,0,0,0,0,0,		
-	  0,0,0,0,0,0,0,0,0,0,
+const uint16_t square_wave[100] =
+	{
+		4095,
+		4095,
+		4095,
+		4095,
+		4095,
+		4095,
+		4095,
+		4095,
+		4095,
+		4095,
+		4095,
+		4095,
+		4095,
+		4095,
+		4095,
+		4095,
+		4095,
+		4095,
+		4095,
+		4095,
+		4095,
+		4095,
+		4095,
+		4095,
+		4095,
+		4095,
+		4095,
+		4095,
+		4095,
+		4095,
+		4095,
+		4095,
+		4095,
+		4095,
+		4095,
+		4095,
+		4095,
+		4095,
+		4095,
+		4095,
+		4095,
+		4095,
+		4095,
+		4095,
+		4095,
+		4095,
+		4095,
+		4095,
+		4095,
+		4095,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
 };
- /*
-  * Fuction prototypes
-  */
+/*
+ * Fuction prototypes
+ */
 void Error_Handler(void);
 static void MX_GPIO_Init(void);
 static void MX_DMA_Init(void);
@@ -161,7 +340,7 @@ void TimerCallback(TimerHandle_t pxTimer);
 /*
  *  Free RTOS Task Section
  */
-static void GUITask(void* params)
+static void GUITask(void *params)
 {
 	touchgfx::HAL::getInstance()->taskEntry();
 }
@@ -174,7 +353,7 @@ int main(void)
 	hw_init();
 	touchgfx_init();
 
-    qsettings_init();
+	qsettings_init();
 
 	MX_GPIO_Init();
 	MX_DMA_Init();
@@ -182,82 +361,78 @@ int main(void)
 	MX_ADC3_Init();
 	MX_TIM3_Init();
 	MX_TIM4_Init();
-	MX_TIM6_Init();	
-	
-	
+	MX_TIM6_Init();
+
 	MX_DAC_Init();
-	
+
 	MX_USART1_UART_Init();
 
 	CanvasWidgetRenderer::setupBuffer(canvasBuffer, CANVAS_BUFFER_SIZE);
 
-	xTaskCreate(GUITask, (TASKCREATE_NAME_TYPE)"GUITask",
-		configGUI_TASK_STK_SIZE,
-		NULL,
-		configGUI_TASK_PRIORITY,
-		NULL);
+	xTaskCreate(GUITask, (TASKCREATE_NAME_TYPE) "GUITask",
+				configGUI_TASK_STK_SIZE,
+				NULL,
+				configGUI_TASK_PRIORITY,
+				NULL);
 
+	htimer = xTimerCreate("Periodic Event", pdMS_TO_TICKS(1000), pdTRUE, 0, TimerCallback);
 
-	htimer = xTimerCreate ("Periodic Event", pdMS_TO_TICKS(1000), pdTRUE, 0, TimerCallback );
-	
-	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)adc_chn1_buffer, ADC_BUFF_SIZ);
-	HAL_ADC_Start_DMA(&hadc3, (uint32_t*)adc_chn2_buffer, ADC_BUFF_SIZ);
-  HAL_DAC_Start_DMA(&DacHandle, DACx_CHANNEL, (uint32_t *)sine_wave, 100, DAC_ALIGN_12B_R);
+	HAL_ADC_Start_DMA(&hadc1, (uint32_t *)adc_chn1_buffer, ADC_BUFF_SIZ);
+	HAL_ADC_Start_DMA(&hadc3, (uint32_t *)adc_chn2_buffer, ADC_BUFF_SIZ);
+	HAL_DAC_Start_DMA(&DacHandle, DACx_CHANNEL, (uint32_t *)sine_wave, 100, DAC_ALIGN_12B_R);
 
 	HAL_TIM_OC_Start(&htim3, TIM_CHANNEL_4);
 	HAL_TIM_OC_Start(&htim4, TIM_CHANNEL_4);
-  HAL_TIM_Base_Start(&htim6);
+	HAL_TIM_Base_Start(&htim6);
 
-  vRegisterCLICommands();
-	 
-	vUARTCommandConsoleStart(); 
-  xTimerStart(htimer, 0);
+	vRegisterCLICommands();
+
+	vUARTCommandConsoleStart();
+	xTimerStart(htimer, 0);
 	vTaskStartScheduler();
 
-	for (;;);
-
+	for (;;)
+		;
 }
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
-  HAL_StatusTypeDef status = HAL_OK;
-  printf("%c", tempBuff.buff[tempBuff.count]);
-  if(huart->Instance == USART1)
-  {
-	  // We can accept the character
-	  if( (tempBuff.count < RX_BUFF_SIZE) && (tempBuff.fullFlag == false))
-	  {
-		  // It's the end of a command
-		  if(tempBuff.buff[tempBuff.count] == '\r')
-		  {
-			  // Signal we have a command and reset pointer
-			  tempBuff.cmdReady = true;
-			  ptrTempBuff = &tempBuff.buff[0];
-		  }
-		  else // Assume character is good
-		  {
-			  tempBuff.count += 1;
-			  ptrTempBuff++;
-			  // Enable reception again
-			  HAL_UART_Receive_IT(huart, ptrTempBuff, sizeof(uint8_t));
-
-		  }
-	  }
-	  else // We can't accept it so start again
-	  {
-		  // Signal an error condition, reset pointer
-		  tempBuff.fullFlag = true;
-		  ptrTempBuff = &tempBuff.buff[0];
-	  }
-  }
+	HAL_StatusTypeDef status = HAL_OK;
+	printf("%c", tempBuff.buff[tempBuff.count]);
+	if (huart->Instance == USART1)
+	{
+		// We can accept the character
+		if ((tempBuff.count < RX_BUFF_SIZE) && (tempBuff.fullFlag == false))
+		{
+			// It's the end of a command
+			if (tempBuff.buff[tempBuff.count] == '\r')
+			{
+				// Signal we have a command and reset pointer
+				tempBuff.cmdReady = true;
+				ptrTempBuff = &tempBuff.buff[0];
+			}
+			else // Assume character is good
+			{
+				tempBuff.count += 1;
+				ptrTempBuff++;
+				// Enable reception again
+				HAL_UART_Receive_IT(huart, ptrTempBuff, sizeof(uint8_t));
+			}
+		}
+		else // We can't accept it so start again
+		{
+			// Signal an error condition, reset pointer
+			tempBuff.fullFlag = true;
+			ptrTempBuff = &tempBuff.buff[0];
+		}
+	}
 }
 
-void TimerCallback(TimerHandle_t pxTimer){
- 
+void TimerCallback(TimerHandle_t pxTimer)
+{
 }
 
-
-void HAL_ADC_ConvHalfCpltCallback(ADC_HandleTypeDef* hadc)
+void HAL_ADC_ConvHalfCpltCallback(ADC_HandleTypeDef *hadc)
 {
 
 	if (hadc->Instance == ADC1)
@@ -268,59 +443,53 @@ void HAL_ADC_ConvHalfCpltCallback(ADC_HandleTypeDef* hadc)
 	{
 		adc_chn2_readptr = 0;
 	}
-
 }
 
-void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
+void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc)
 {
 	if (hadc->Instance == ADC1)
 	{
-		adc_chn1_readptr = ADC_BUFF_SIZ/2;
+		adc_chn1_readptr = ADC_BUFF_SIZ / 2;
 	}
 	else if (hadc->Instance == ADC3)
 	{
-		adc_chn2_readptr = ADC_BUFF_SIZ/2;
+		adc_chn2_readptr = ADC_BUFF_SIZ / 2;
 	}
 }
 
-
-uint16_t* PushDaTaToModel_1(void)
+uint16_t *PushDaTaToModel_1(void)
 {
 	return &adc_chn1_buffer[adc_chn1_readptr];
-
 }
 
-uint16_t* PushDaTaToModel_2(void)
+uint16_t *PushDaTaToModel_2(void)
 {
 	return &adc_chn2_buffer[adc_chn2_readptr];
-
 }
-
 
 // 0 : stop
 // 1 : sine
 // 2 : square
 void gen_set_signal_type(int type)
 {
-	
-  HAL_DAC_Stop_DMA(&DacHandle, DACx_CHANNEL);		
-	if(type == 1)
+
+	HAL_DAC_Stop_DMA(&DacHandle, DACx_CHANNEL);
+	if (type == 1)
 	{
-    HAL_DAC_Start_DMA(&DacHandle, DACx_CHANNEL, (uint32_t *)sine_wave, 100, DAC_ALIGN_12B_R);
+		HAL_DAC_Start_DMA(&DacHandle, DACx_CHANNEL, (uint32_t *)sine_wave, 100, DAC_ALIGN_12B_R);
 	}
-	else if(type == 2)
+	else if (type == 2)
 	{
-    HAL_DAC_Start_DMA(&DacHandle, DACx_CHANNEL, (uint32_t *)square_wave, 100, DAC_ALIGN_12B_R);
+		HAL_DAC_Start_DMA(&DacHandle, DACx_CHANNEL, (uint32_t *)square_wave, 100, DAC_ALIGN_12B_R);
 	}
 }
-
 
 // 0 :  1 KHz
 // 1 : 10 KHz
 
 void gen_set_signal_freq(int freq)
 {
-	if(freq == 0)
+	if (freq == 0)
 	{
 		__HAL_TIM_SET_AUTORELOAD(&htim6, 0x3E8);
 	}
@@ -331,58 +500,57 @@ void gen_set_signal_freq(int freq)
 }
 
 /**
-  * @brief  TIM6 Configuration
-  * @note   TIM6 configuration is based on APB1 frequency
-  * @note   TIM6 Update event occurs each TIM6CLK/256
-  * @param  None
-  * @retval None
-  */
+ * @brief  TIM6 Configuration
+ * @note   TIM6 configuration is based on APB1 frequency
+ * @note   TIM6 Update event occurs each TIM6CLK/256
+ * @param  None
+ * @retval None
+ */
 static void MX_TIM6_Init(void)
 {
 
-  TIM_MasterConfigTypeDef sMasterConfig;
+	TIM_MasterConfigTypeDef sMasterConfig;
 
-	 __HAL_RCC_TIM6_CLK_ENABLE();
-	
-  /*##-1- Configure the TIM peripheral #######################################*/
-  /* Time base configuration */
-  htim6.Instance = TIM6;
+	__HAL_RCC_TIM6_CLK_ENABLE();
 
-  htim6.Init.Period            = 0x3E8;//0x64;
-  htim6.Init.Prescaler         = 0;
-  htim6.Init.ClockDivision     = 0;
-  htim6.Init.CounterMode       = TIM_COUNTERMODE_UP;
-  htim6.Init.RepetitionCounter = 0;
-  HAL_TIM_Base_Init(&htim6);
+	/*##-1- Configure the TIM peripheral #######################################*/
+	/* Time base configuration */
+	htim6.Instance = TIM6;
 
-  /* TIM6 TRGO selection */
-  sMasterConfig.MasterOutputTrigger = TIM_TRGO_UPDATE;
-  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+	htim6.Init.Period = 0x3E8; // 0x64;
+	htim6.Init.Prescaler = 0;
+	htim6.Init.ClockDivision = 0;
+	htim6.Init.CounterMode = TIM_COUNTERMODE_UP;
+	htim6.Init.RepetitionCounter = 0;
+	HAL_TIM_Base_Init(&htim6);
 
-  HAL_TIMEx_MasterConfigSynchronization(&htim6, &sMasterConfig);
+	/* TIM6 TRGO selection */
+	sMasterConfig.MasterOutputTrigger = TIM_TRGO_UPDATE;
+	sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+
+	HAL_TIMEx_MasterConfigSynchronization(&htim6, &sMasterConfig);
 }
 
 static void MX_DAC_Init(void)
 {
-  DAC_ChannelConfTypeDef sConfig;	
-  DacHandle.Instance = DACx;
-  
-  if (HAL_DAC_Init(&DacHandle) != HAL_OK)
-  {
-    /* Initialization Error */
-    Error_Handler();
-  }
+	DAC_ChannelConfTypeDef sConfig;
+	DacHandle.Instance = DACx;
 
-  /*##-1- DAC channel1 Configuration #########################################*/
-  sConfig.DAC_Trigger = DAC_TRIGGER_T6_TRGO;
-  sConfig.DAC_OutputBuffer = DAC_OUTPUTBUFFER_ENABLE;
+	if (HAL_DAC_Init(&DacHandle) != HAL_OK)
+	{
+		/* Initialization Error */
+		Error_Handler();
+	}
 
-  if (HAL_DAC_ConfigChannel(&DacHandle, &sConfig, DACx_CHANNEL) != HAL_OK)
-  {
-    /* Channel configuration Error */
-    Error_Handler();
-  }	
+	/*##-1- DAC channel1 Configuration #########################################*/
+	sConfig.DAC_Trigger = DAC_TRIGGER_T6_TRGO;
+	sConfig.DAC_OutputBuffer = DAC_OUTPUTBUFFER_ENABLE;
 
+	if (HAL_DAC_ConfigChannel(&DacHandle, &sConfig, DACx_CHANNEL) != HAL_OK)
+	{
+		/* Channel configuration Error */
+		Error_Handler();
+	}
 }
 
 /* ADC1 init function */
@@ -392,7 +560,7 @@ static void MX_ADC1_Init(void)
 	ADC_ChannelConfTypeDef sConfig;
 
 	/**Configure the global features of the ADC (Clock, Resolution, Data Alignment and number of conversion)
-	*/
+	 */
 	hadc1.Instance = ADC1;
 	hadc1.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV2;
 	hadc1.Init.Resolution = ADC_RESOLUTION_12B;
@@ -411,7 +579,7 @@ static void MX_ADC1_Init(void)
 	}
 
 	/**Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
-	*/
+	 */
 	sConfig.Channel = ADC_CHANNEL_0;
 	sConfig.Rank = 1;
 	sConfig.SamplingTime = ADC_SAMPLETIME_3CYCLES;
@@ -419,7 +587,6 @@ static void MX_ADC1_Init(void)
 	{
 		Error_Handler();
 	}
-
 }
 
 /* ADC3 init function */
@@ -429,7 +596,7 @@ static void MX_ADC3_Init(void)
 	ADC_ChannelConfTypeDef sConfig;
 
 	/**Configure the global features of the ADC (Clock, Resolution, Data Alignment and number of conversion)
-	*/
+	 */
 	hadc3.Instance = ADC3;
 	hadc3.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV2;
 	hadc3.Init.Resolution = ADC_RESOLUTION_12B;
@@ -437,7 +604,7 @@ static void MX_ADC3_Init(void)
 	hadc3.Init.ContinuousConvMode = DISABLE;
 	hadc3.Init.DiscontinuousConvMode = DISABLE;
 	hadc3.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_RISING;
-	//hadc3.Init.ExternalTrigConv = ADC_EXTERNALTRIGCONV_T4_TRGO;
+	// hadc3.Init.ExternalTrigConv = ADC_EXTERNALTRIGCONV_T4_TRGO;
 	hadc3.Init.ExternalTrigConv = ADC_EXTERNALTRIGCONV_T4_CC4;
 	hadc3.Init.DataAlign = ADC_DATAALIGN_RIGHT;
 	hadc3.Init.NbrOfConversion = 1;
@@ -449,7 +616,7 @@ static void MX_ADC3_Init(void)
 	}
 
 	/**Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
-	*/
+	 */
 	sConfig.Channel = ADC_CHANNEL_8;
 	sConfig.Rank = 1;
 	sConfig.SamplingTime = ADC_SAMPLETIME_3CYCLES;
@@ -457,12 +624,11 @@ static void MX_ADC3_Init(void)
 	{
 		Error_Handler();
 	}
-
 }
 
 /**
-  * Enable DMA controller clock
-  */
+ * Enable DMA controller clock
+ */
 static void MX_DMA_Init(void)
 {
 	/* DMA controller clock enable */
@@ -475,16 +641,15 @@ static void MX_DMA_Init(void)
 	/* DMA2_Stream4_IRQn interrupt configuration */
 	HAL_NVIC_SetPriority(DMA2_Stream4_IRQn, 0, 0);
 	HAL_NVIC_EnableIRQ(DMA2_Stream4_IRQn);
-
 }
 
 /** Configure pins as
-		* Analog
-		* Input
-		* Output
-		* EVENT_OUT
-		* EXTI
-*/
+ * Analog
+ * Input
+ * Output
+ * EVENT_OUT
+ * EXTI
+ */
 static void MX_GPIO_Init(void)
 {
 
@@ -564,7 +729,7 @@ static void MX_TIM4_Init(void)
 	{
 		Error_Handler();
 	}
-	
+
 	sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
 	if (HAL_TIM_ConfigClockSource(&htim4, &sClockSourceConfig) != HAL_OK)
 	{
@@ -586,9 +751,7 @@ static void MX_TIM4_Init(void)
 	{
 		Error_Handler();
 	}
-
 }
-
 
 /* USART1 init function */
 static void MX_USART1_UART_Init(void)
@@ -608,9 +771,8 @@ static void MX_USART1_UART_Init(void)
 	{
 		Error_Handler();
 	}
-	
-	// HAL_UART_Receive_IT(&huart1, &tempBuff.buff[0], sizeof(uint8_t));
 
+	// HAL_UART_Receive_IT(&huart1, &tempBuff.buff[0], sizeof(uint8_t));
 }
 
 /* TIM3 init function */
@@ -618,15 +780,15 @@ static void MX_TIM3_Init_Mod(int period, int prescaler)
 {
 
 	__HAL_TIM_SET_AUTORELOAD(&htim3, period);
-	__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_4, period/2);
+	__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_4, period / 2);
 	__HAL_TIM_SET_PRESCALER(&htim3, prescaler);
 }
 
 static void MX_TIM4_Init_Mod(int period, int prescaler)
 {
 	__HAL_TIM_SET_AUTORELOAD(&htim4, period);
-	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_4, period/2);
-	__HAL_TIM_SET_PRESCALER(&htim4, prescaler);	
+	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_4, period / 2);
+	__HAL_TIM_SET_PRESCALER(&htim4, prescaler);
 }
 
 /* USER CODE BEGIN 4 */
@@ -634,10 +796,10 @@ static void MX_TIM4_Init_Mod(int period, int prescaler)
 /* USER CODE END 4 */
 
 /**
-  * @brief  This function is executed in case of error occurrence.
-  * @param  None
-  * @retval None
-  */
+ * @brief  This function is executed in case of error occurrence.
+ * @param  None
+ * @retval None
+ */
 void Error_Handler(void)
 {
 	/* USER CODE BEGIN Error_Handler */
@@ -655,7 +817,7 @@ extern "C"
 	{
 		/* Place your implementation of fputc here */
 		/* e.g. write a character to the EVAL_COM1 and Loop until the end of transmission */
-		HAL_UART_Transmit(&huart1, (uint8_t*)&ch, 1, 0xFFFF);
+		HAL_UART_Transmit(&huart1, (uint8_t *)&ch, 1, 0xFFFF);
 
 		return ch;
 	}
@@ -663,15 +825,15 @@ extern "C"
 
 void ControlHWRunStop(int state)
 {
-	if(state == 0)
+	if (state == 0)
 	{
 		HAL_ADC_Stop_DMA(&hadc1);
 		HAL_ADC_Stop_DMA(&hadc3);
 	}
 	else
 	{
-		HAL_ADC_Start_DMA(&hadc1, (uint32_t*)adc_chn1_buffer, ADC_BUFF_SIZ);
-		HAL_ADC_Start_DMA(&hadc3, (uint32_t*)adc_chn2_buffer, ADC_BUFF_SIZ);
+		HAL_ADC_Start_DMA(&hadc1, (uint32_t *)adc_chn1_buffer, ADC_BUFF_SIZ);
+		HAL_ADC_Start_DMA(&hadc3, (uint32_t *)adc_chn2_buffer, ADC_BUFF_SIZ);
 	}
 }
 
@@ -683,89 +845,88 @@ void UpdateHWTimeScale(int channel, int value)
 	switch (value)
 	{
 
-
-		//Div 25us // 1.530 MHz
+		// Div 25us // 1.530 MHz
 	case 13:
 		period = 5;
-	  prescaler = 4;
-		break;
-	
-		//Div 50us // 765 KHz
-	case 0:
-		period = 12 ;
-	  prescaler = 4;	
+		prescaler = 4;
 		break;
 
-		//Div 100us // 382.5KHz / 800K
+		// Div 50us // 765 KHz
+	case 0:
+		period = 12;
+		prescaler = 4;
+		break;
+
+		// Div 100us // 382.5KHz / 800K
 	case 1:
 		period = 25;
-	  prescaler = 4;	
+		prescaler = 4;
 		break;
 
-		//Div 200us // 191,250 KHz
+		// Div 200us // 191,250 KHz
 	case 2:
 		period = 51;
-	  prescaler = 4;	
+		prescaler = 4;
 		break;
 
-		//Div 500us // 76.5 KHz
+		// Div 500us // 76.5 KHz
 	case 3:
 		period = 129;
-	  prescaler = 4;	
+		prescaler = 4;
 		break;
 
-		//Div 1ms  // 38.25 KHz
+		// Div 1ms  // 38.25 KHz
 	case 4:
 		period = 259;
-	  prescaler = 4;	
+		prescaler = 4;
 		break;
 
-		//Div 2ms  // 19.125 KHz
+		// Div 2ms  // 19.125 KHz
 	case 5:
 		period = 521;
-	  prescaler = 4;	
+		prescaler = 4;
 		break;
 
-		//Div 5ms  // 7.65 KHz
+		// Div 5ms  // 7.65 KHz
 	case 6:
 		period = 1304;
-	  prescaler = 4;	
+		prescaler = 4;
 		break;
 
-		//Div 10ms  // 3.825 KHz
+		// Div 10ms  // 3.825 KHz
 	case 7:
 		period = 2609;
-	  prescaler = 4;	
+		prescaler = 4;
 		break;
 
-		//Div 20ms // 1.9125 KHz
+		// Div 20ms // 1.9125 KHz
 	case 8:
 		period = 5219;
-	  prescaler = 4;	
+		prescaler = 4;
 		break;
 
-		//Div 50ms  // 765 Hz
+		// Div 50ms  // 765 Hz
 	case 9:
 		period = 13049;
-	  prescaler = 4;	
+		prescaler = 4;
 		break;
 
-		//Div 100ms // 382.5 Hz
+		// Div 100ms // 382.5 Hz
 	case 10:
 		period = 26099;
 		prescaler = 4;
 		break;
 
-		//Div 200ms // 191.25 Hz
+		// Div 200ms // 191.25 Hz
 	case 11:
 		period = 52199;
-	  prescaler = 4;	
+		prescaler = 4;
 		break;
 
-		//Div 500ms // 76.5 Hz
+		// Div 500ms // 76.5 Hz
 	case 12:
 		period = 52199;
-	  prescaler = 9;	
+		prescaler = 9;
 		break;
 	}
 	if (channel == 0)
@@ -777,19 +938,18 @@ void UpdateHWTimeScale(int channel, int value)
 #ifdef USE_FULL_ASSERT
 
 /**
-   * @brief Reports the name of the source file and the source line number
-   * where the assert_param error has occurred.
-   * @param file: pointer to the source file name
-   * @param line: assert_param error line source number
-   * @retval None
-   */
-void assert_failed(uint8_t* file, uint32_t line)
+ * @brief Reports the name of the source file and the source line number
+ * where the assert_param error has occurred.
+ * @param file: pointer to the source file name
+ * @param line: assert_param error line source number
+ * @retval None
+ */
+void assert_failed(uint8_t *file, uint32_t line)
 {
 	/* USER CODE BEGIN 6 */
 	/* User can add his own implementation to report the file name and line number,
 	  ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
-	  /* USER CODE END 6 */
-
+	/* USER CODE END 6 */
 }
 
 #endif
